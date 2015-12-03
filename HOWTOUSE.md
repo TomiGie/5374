@@ -10,7 +10,7 @@
 
 
 ## 提供されるゴミ情報について
-YOUR_CITYが公開しているオープンデータをもとにしています。
+石巻市が公開しているオープンデータをもとにしています。
 
 
 ## 開発チームとライセンスについて
@@ -22,6 +22,6 @@ YOUR_CITYが公開しているオープンデータをもとにしています�
 本アプリ及びソースコードの著作権はCode for Kanazawaに帰属します。
 但し、このソースコードは[MPL](http://www.mozilla.org/MPL/2.0/)のもと配布されています。MPLに従えば、どなたでも利用、改変、及び再配布が可能です。
 
-## Contributers in YOUR_CITY
+## Contributers in ISHINOMAKI
 
-[YOUR_NAME](http://github.com/YOUR_NAME)
+[ITNAV](http://itnav.jp)
