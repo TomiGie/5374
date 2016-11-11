@@ -1,7 +1,7 @@
 label,sublabel,description,styles,bgcolor
-燃やさないごみ,,,img/moyasanai02.svg,#733b96
+燃やせないごみ,,,img/moyasanai02.svg,#733b96
 ペットボトル,,,img/pet02.svg,#e1528f
 空き缶,,,img/akikan02.svg,#40c4d4
-燃やすごみ,,,img/moyasu02.svg,#ea3b13
+燃やせるごみ,,,img/moyasu02.svg,#ea3b13
 びん,,,img/bin02.svg,#2dc7aa
 ダンボール,,,img/danboru02.svg,#eac413
