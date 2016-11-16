@@ -670,6 +670,16 @@ $(function() {
             '<span style="background:orange">' + target + '</span>')
       );
     });
+
+    // 一つでも見つかった場合は最初のヒット場所に移動
+    if (beforeSearchObjects.length != 0) {
+      var position = $(beforeSearchObjects[0]).offset().top;
+      $("html, body").animate({
+        scrollTop : position
+      }, {
+        queue : false
+      });
+    }
   }
 
   /**
