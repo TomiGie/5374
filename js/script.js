@@ -674,12 +674,21 @@ $(function() {
 
     // 一つでも見つかった場合は最初のヒット場所に移動
     if (beforeSearchObjects.length != 0) {
-      var position = $(beforeSearchObjects[0]).offset().top;
-      $("html, body").animate({
-        scrollTop : position
-      }, {
-        queue : false
-      });
+      // 該当要素があるaccordionを開く
+      for (var i = beforeSearchObjects.length - 1; i >= 0; i--) {
+        $(beforeSearchObjects[i]).parents('.accordion-body').collapse('show');
+      }
+      
+      // 開くアニメーションが終わるまで待つ
+      setTimeout(function() {
+        // 最初のヒット場所に移動
+        var position = $(beforeSearchObjects[0]).offset().top;
+        $("html, body").animate({
+          scrollTop : position
+        }, {
+          queue : true
+        });
+      }, 500);
     }
   }
 
