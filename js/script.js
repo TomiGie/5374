@@ -687,7 +687,7 @@ $(function() {
    */
   function clearSearch() {
     // 履歴が無い場合は無視
-    if (beforeSearchObjects == null) {
+    if (beforeSearchObjects == null || beforeSearchSrcs == null) {
       return;
     }
 
@@ -696,8 +696,8 @@ $(function() {
       $(beforeSearchObjects[i]).html(beforeSearchSrcs[i]);
 
       // 一時情報を削除
-      beforeSearchObjects = null;
-      beforeSearchSrcs = null;
+      beforeSearchObjects[i] = null;
+      beforeSearchSrcs[i] = null;
     }
   }
 
