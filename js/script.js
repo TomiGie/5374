@@ -530,20 +530,21 @@ $(function() {
 
     $('html,body').animate({ scrollTop: 0 }, 'fast');
 
-    // アコーディオンのラベル部分をクリックしたら
-    $(".accordion-body").on("shown.bs.collapse", function() {
-      var body = $('body');
-      var accordion_offset = $($(this).parent().get(0)).offset().top;
-      body.animate({
-        scrollTop: accordion_offset
-      }, 50);
-    });
-    // アコーディオンの非表示部分をクリックしたら
-    $(".accordion-body").on("hidden.bs.collapse", function() {
-      if ($(".in").length == 0) {
-        $("html, body").scrollTop(0);
-      }
-    });
+    /* 検索時に不便なので無効化 */
+    // // アコーディオンのラベル部分をクリックしたら
+    // $(".accordion-body").on("shown.bs.collapse", function() {
+    //   var body = $('body');
+    //   var accordion_offset = $($(this).parent().get(0)).offset().top;
+    //   body.animate({
+    //     scrollTop: accordion_offset
+    //   }, 50);
+    // });
+    // // アコーディオンの非表示部分をクリックしたら
+    // $(".accordion-body").on("hidden.bs.collapse", function() {
+    //   if ($(".in").length == 0) {
+    //     $("html, body").scrollTop(0);
+    //   }
+    // });
   }
 
   function onChangeSelect(row_index) {　
