@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/TomiGie/5374/issues"
   },
-  "homepage": "https://github.com/TomiGie/5374#readme"
+  "homepage": "https://github.com/TomiGie/5374#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
 }
