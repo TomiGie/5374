@@ -694,11 +694,11 @@ $(function() {
     for (var i = 0; i < beforeSearchObjects.length; i++) {
       // 要素を元に戻す
       $(beforeSearchObjects[i]).html(beforeSearchSrcs[i]);
-
-      // 一時情報を削除
-      beforeSearchObjects[i] = null;
-      beforeSearchSrcs[i] = null;
     }
+
+    // 一時情報を削除
+    beforeSearchObjects = null;
+    beforeSearchSrcs = null;
   }
 
   // ****************************** 文字列検索機能 -ed
