@@ -682,7 +682,7 @@ $(function() {
       // 開くアニメーションが終わるまで待つ
       setTimeout(function() {
         // 最初のヒット場所に移動
-        var position = $(beforeSearchObjects[0]).offset().top;
+        var position = $(beforeSearchObjects[0]).offset().top - $(window).height()/2;
         $("html, body").animate({
           scrollTop : position
         }, {
