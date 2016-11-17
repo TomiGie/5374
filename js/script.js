@@ -530,20 +530,21 @@ $(function() {
 
     $('html,body').animate({ scrollTop: 0 }, 'fast');
 
-    // アコーディオンのラベル部分をクリックしたら
-    $(".accordion-body").on("shown.bs.collapse", function() {
-      var body = $('body');
-      var accordion_offset = $($(this).parent().get(0)).offset().top;
-      body.animate({
-        scrollTop: accordion_offset
-      }, 50);
-    });
-    // アコーディオンの非表示部分をクリックしたら
-    $(".accordion-body").on("hidden.bs.collapse", function() {
-      if ($(".in").length == 0) {
-        $("html, body").scrollTop(0);
-      }
-    });
+    /* 検索時に不便なので無効化 */
+    // // アコーディオンのラベル部分をクリックしたら
+    // $(".accordion-body").on("shown.bs.collapse", function() {
+    //   var body = $('body');
+    //   var accordion_offset = $($(this).parent().get(0)).offset().top;
+    //   body.animate({
+    //     scrollTop: accordion_offset
+    //   }, 50);
+    // });
+    // // アコーディオンの非表示部分をクリックしたら
+    // $(".accordion-body").on("hidden.bs.collapse", function() {
+    //   if ($(".in").length == 0) {
+    //     $("html, body").scrollTop(0);
+    //   }
+    // });
   }
 
   function onChangeSelect(row_index) {　
@@ -627,4 +628,88 @@ $(function() {
     }
   }
   updateAreaList();
+
+  // ****************************** 文字列検索機能 -st
+
+  /** 検索用一時情報 オブジェクト */
+  var beforeSearchObjects = null;
+  /** 検索用一時情報 ハイライト前のsrc */
+  var beforeSearchSrcs = null;
+
+  /**
+   * 検索ボタンを押した時の挙動
+   */
+  $("#queryButton").click(function() {
+    var target = $("#queryInput").val();
+    search(target);
+  });
+
+  /**
+   * 文字列で検索し、背景色をオレンジにする
+   * @param {string} target 検索する文字列 
+   */
+  function search (target) {
+    // 検索状態を解除
+    clearSearch();
+
+    // 検索用一時情報初期化
+    beforeSearchObjects = [];
+    beforeSearchSrcs = [];
+
+    // 要素を取得
+    $('li:contains("' + target + '")').each(function() {
+      var self = this;
+      var src = $(self).html();
+
+      // 一時情報保存
+      beforeSearchObjects.push(self);
+      beforeSearchSrcs.push(src);
+
+      $(self).html(
+        // 該当情報ハイライト
+        src.replace(new RegExp(target, "g"),
+            '<span style="background:orange">' + target + '</span>')
+      );
+    });
+
+    // 一つでも見つかった場合は最初のヒット場所に移動
+    if (beforeSearchObjects.length != 0) {
+      // 該当要素があるaccordionを開く
+      for (var i = beforeSearchObjects.length - 1; i >= 0; i--) {
+        $(beforeSearchObjects[i]).parents('.accordion-body').collapse('show');
+      }
+      
+      // 開くアニメーションが終わるまで待つ
+      setTimeout(function() {
+        // 最初のヒット場所に移動
+        var position = $(beforeSearchObjects[0]).offset().top - $(window).height()/2;
+        $("html, body").animate({
+          scrollTop : position
+        }, {
+          queue : true
+        });
+      }, 500);
+    }
+  }
+
+  /**
+   * 検索で変わった背景を元に戻す
+   */
+  function clearSearch() {
+    // 履歴が無い場合は無視
+    if (beforeSearchObjects == null || beforeSearchSrcs == null) {
+      return;
+    }
+
+    for (var i = 0; i < beforeSearchObjects.length; i++) {
+      // 要素を元に戻す
+      $(beforeSearchObjects[i]).html(beforeSearchSrcs[i]);
+    }
+
+    // 一時情報を削除
+    beforeSearchObjects = null;
+    beforeSearchSrcs = null;
+  }
+
+  // ****************************** 文字列検索機能 -ed
 });
