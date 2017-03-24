@@ -1,24 +1,26 @@
 "use strict";
 
 /**
-  エリア(ごみ処理の地域）を管理するクラスです。
-*/
+ * エリア(ごみ処理の地域）を管理するクラスです。
+ */
 var AreaModel = function() {
   this.label;
   this.centerName;
   this.center;
   this.trash = new Array();
+
   /**
-  各ゴミのカテゴリに対して、最も直近の日付を計算します。
-*/
+   * 各ゴミのカテゴリに対して、最も直近の日付を計算します。
+   */
   this.calcMostRect = function() {
     for (var i = 0; i < this.trash.length; i++) {
       this.trash[i].calcMostRect(this);
     }
   }
+
   /**
-    休止期間（主に年末年始）かどうかを判定します。
-  */
+   * 休止期間（主に年末年始）かどうかを判定します。
+   */
   this.isBlankDay = function(currentDate) {
     var period = [this.center.startDate, this.center.endDate];
 
@@ -28,10 +30,11 @@ var AreaModel = function() {
     }
     return false;
   }
+
   /**
-    ゴミ処理センターを登録します。
-    名前が一致するかどうかで判定を行っております。
-  */
+   * ゴミ処理センターを登録します。
+   * 名前が一致するかどうかで判定を行っております。
+   */
   this.setCenter = function(center_data) {
     for (var i in center_data) {
       if (this.centerName == center_data[i].name) {
@@ -39,9 +42,10 @@ var AreaModel = function() {
       }
     }
   }
+
   /**
-  ゴミのカテゴリのソートを行います。
-*/
+   * ゴミのカテゴリのソートを行います。
+   */
   this.sortTrash = function() {
     this.trash.sort(function(a, b) {
       var at = a.mostRecent.getTime();
@@ -54,8 +58,8 @@ var AreaModel = function() {
 }
 
 /**
-  各ゴミのカテゴリを管理するクラスです。
-*/
+ * 各ゴミのカテゴリを管理するクラスです。
+ */
 var TrashModel = function(_lable, _cell, remarks) {
   this.remarks = remarks;
   this.dayLabel;
@@ -75,7 +79,7 @@ var TrashModel = function(_lable, _cell, remarks) {
   }
   this.label = _lable;
   this.description;
-  this.regularFlg = 1;      // 定期回収フラグ（デフォルトはオン:1）
+  this.regularFlg = 1; // 定期回収フラグ（デフォルトはオン:1）
 
   var result_text = "";
   var today = new Date();
@@ -83,13 +87,12 @@ var TrashModel = function(_lable, _cell, remarks) {
   for (var j in this.dayCell) {
     if (this.dayCell[j].length == 1) {
       result_text += "毎週" + this.dayCell[j] + "曜日 ";
-    } else if (this.dayCell[j].length == 2 && this.dayCell[j].substr(0,1) != "*") {
+    } else if (this.dayCell[j].length == 2 && this.dayCell[j].substr(0, 1) != "*") {
       result_text += "第" + this.dayCell[j].charAt(1) + this.dayCell[j].charAt(0) + "曜日 ";
-    } else if (this.dayCell[j].length == 2 && this.dayCell[j].substr(0,1) == "*") {
-    } else {
+    } else if (this.dayCell[j].length == 2 && this.dayCell[j].substr(0, 1) == "*") {} else {
       // 不定期回収の場合（YYYYMMDD指定）
       result_text = "不定期 ";
-      this.regularFlg = 0;  // 定期回収フラグオフ
+      this.regularFlg = 0; // 定期回収フラグオフ
     }
   }
   this.dayLabel = result_text;
@@ -109,15 +112,16 @@ var TrashModel = function(_lable, _cell, remarks) {
     };
     return -1;
   }
+
   /**
    * このごみ収集日が特殊な条件を持っている場合備考を返します。収集日データに"*n" が入っている場合に利用されます
    */
   this.getRemark = function getRemark() {
     var ret = "";
-    this.dayCell.forEach(function(day){
-      if (day.substr(0,1) == "*") {
-        remarks.forEach(function(remark){
-          if (remark.id == day.substr(1,1)){
+    this.dayCell.forEach(function(day) {
+      if (day.substr(0, 1) == "*") {
+        remarks.forEach(function(remark) {
+          if (remark.id == day.substr(1, 1)) {
             ret += remark.text + "<br/>";
           }
         });
@@ -125,10 +129,11 @@ var TrashModel = function(_lable, _cell, remarks) {
     });
     return ret;
   }
+
   /**
-  このゴミの年間のゴミの日を計算します。
-  センターが休止期間がある場合は、その期間１週間ずらすという実装を行っております。
-*/
+   * このゴミの年間のゴミの日を計算します。
+   * センターが休止期間がある場合は、その期間１週間ずらすという実装を行っております。
+   */
   this.calcMostRect = function(areaObj) {
     var day_mix = this.dayCell;
     var result_text = "";
@@ -148,25 +153,25 @@ var TrashModel = function(_lable, _cell, remarks) {
 
         // 収集が無い月はスキップ
         if (this.mflag[month - 1] == 0) {
-            continue;
+          continue;
         }
         for (var j in day_mix) {
-          //休止期間だったら、今後一週間ずらす。
+          // 休止期間だったら、今後一週間ずらす。
           var isShift = false;
 
-          //week=0が第1週目です。
+          // week=0が第1週目です。
           for (var week = 0; week < 5; week++) {
-            //4月1日を起点として第n曜日などを計算する。
+            // 4月1日を起点として第n曜日などを計算する。
             var date = new Date(curYear, month - 1, 1);
             var d = new Date(date);
-            //コンストラクタでやろうとするとうまく行かなかった。。
-            //
-            //4月1日を基準にして曜日の差分で時間を戻し、最大５週までの増加させて毎週を表現
+            // コンストラクタでやろうとするとうまく行かなかった。。
+            // 
+            // 4月1日を基準にして曜日の差分で時間を戻し、最大５週までの増加させて毎週を表現
             d.setTime(date.getTime() + 1000 * 60 * 60 * 24 *
               ((7 + getDayIndex(day_mix[j].charAt(0)) - date.getDay()) % 7) + week * 7 * 24 * 60 * 60 * 1000
             );
-            //年末年始のずらしの対応
-            //休止期間なら、今後の日程を１週間ずらす
+            // 年末年始のずらしの対応
+            // 休止期間なら、今後の日程を１週間ずらす
             if (areaObj.isBlankDay(d)) {
               if (WeekShift) {
                 isShift = true;
@@ -177,11 +182,11 @@ var TrashModel = function(_lable, _cell, remarks) {
             if (isShift) {
               d.setTime(d.getTime() + 7 * 24 * 60 * 60 * 1000);
             }
-            //同じ月の時のみ処理したい
+            // 同じ月の時のみ処理したい
             if (d.getMonth() != (month - 1) % 12) {
               continue;
             }
-            //特定の週のみ処理する
+            // 特定の週のみ処理する
             if (day_mix[j].length > 1) {
               if (week != day_mix[j].charAt(1) - 1) {
                 continue;
@@ -202,16 +207,16 @@ var TrashModel = function(_lable, _cell, remarks) {
         day_list.push(d);
       }
     }
-    //曜日によっては日付順ではないので最終的にソートする。
-    //ソートしなくてもなんとなりそうな気もしますが、とりあえずソート
+    // 曜日によっては日付順ではないので最終的にソートする。
+    // ソートしなくてもなんとなりそうな気もしますが、とりあえずソート
     day_list.sort(function(a, b) {
-      var at = a.getTime();
-      var bt = b.getTime();
-      if (at < bt) return -1;
-      if (at > bt) return 1;
-      return 0;
-    })
-    //直近の日付を更新
+        var at = a.getTime();
+        var bt = b.getTime();
+        if (at < bt) return -1;
+        if (at > bt) return 1;
+        return 0;
+      })
+      // 直近の日付を更新
     var now = new Date();
 
     for (var i in day_list) {
@@ -223,9 +228,10 @@ var TrashModel = function(_lable, _cell, remarks) {
 
     this.dayList = day_list;
   }
+
   /**
-   計算したゴミの日一覧をリスト形式として取得します。
-  */
+   * 計算したゴミの日一覧をリスト形式として取得します。
+   */
   this.getDayList = function() {
     var day_text = "<ul>";
     for (var i in this.dayList) {
@@ -236,9 +242,10 @@ var TrashModel = function(_lable, _cell, remarks) {
     return day_text;
   }
 }
+
 /**
-センターのデータを管理します。
-*/
+ * センターのデータを管理します。
+ */
 var CenterModel = function(row) {
   function getDay(center, index) {
     var tmp = center[index].split("/");
@@ -249,20 +256,22 @@ var CenterModel = function(row) {
   this.startDate = getDay(row, 1);
   this.endDate = getDay(row, 2);
 }
+
 /**
-* ゴミのカテゴリを管理するクラスです。
-* description.csvのモデルです。
-*/
+ * ゴミのカテゴリを管理するクラスです。
+ * description.csvのモデルです。
+ */
 var DescriptionModel = function(data) {
   this.targets = new Array();
 
   this.label = data[0];
-  this.sublabel = data[1];//not used
-  this.description = data[2];//not used
+  this.sublabel = data[1]; // not used
+  this.description = data[2]; // not used
   this.styles = data[3];
   this.background = data[4];
 
 }
+
 /**
  * ゴミのカテゴリの中のゴミの具体的なリストを管理するクラスです。
  * target.csvのモデルです。
@@ -286,13 +295,13 @@ var RemarkModel = function(data) {
 /* var windowHeight; */
 
 $(function() {
-/*   windowHeight = $(window).height(); */
+  /*   windowHeight = $(window).height(); */
 
   var center_data = new Array();
   var descriptions = new Array();
   var areaModels = new Array();
   var remarks = new Array();
-/*   var descriptions = new Array(); */
+  /*   var descriptions = new Array(); */
 
 
   function getSelectedAreaName() {
@@ -305,15 +314,15 @@ $(function() {
 
   function csvToArray(filename, cb) {
     $.get(filename, function(csvdata) {
-      //CSVのパース作業
-      //CRの解析ミスがあった箇所を修正しました。
-      //以前のコードだとCRが残ったままになります。
+      // CSVのパース作業
+      // CRの解析ミスがあった箇所を修正しました。
+      // 以前のコードだとCRが残ったままになります。
       // var csvdata = csvdata.replace("\r/gm", ""),
-       csvdata = csvdata.replace(/\r/gm, "");
+      csvdata = csvdata.replace(/\r/gm, "");
       var line = csvdata.split("\n"),
-          ret = [];
+        ret = [];
       for (var i in line) {
-        //空行はスルーする。
+        // 空行はスルーする。
         if (line[i].length == 0) continue;
 
         var row = line[i].split(",");
@@ -333,7 +342,7 @@ $(function() {
         area.centerName = row[1];
 
         areaModels.push(area);
-        //２列目以降の処理
+        // ２列目以降の処理
         for (var r = 2; r < 2 + MaxDescription; r++) {
           if (area_days_label[r]) {
             var trash = new TrashModel(area_days_label[r], row[r], remarks);
@@ -343,10 +352,10 @@ $(function() {
       }
 
       csvToArray("data/center.csv", function(tmp) {
-        //ゴミ処理センターのデータを解析します。
-        //表示上は現れませんが、
-        //金沢などの各処理センターの休止期間分は一週間ずらすという法則性のため
-        //例えば第一金曜日のときは、一周ずらしその月だけ第二金曜日にする
+        // ゴミ処理センターのデータを解析します。
+        // 表示上は現れませんが、
+        // 金沢などの各処理センターの休止期間分は一週間ずらすという法則性のため
+        // 例えば第一金曜日のときは、一周ずらしその月だけ第二金曜日にする
         tmp.shift();
         for (var i in tmp) {
           var row = tmp[i];
@@ -354,13 +363,13 @@ $(function() {
           var center = new CenterModel(row);
           center_data.push(center);
         }
-        //ゴミ処理センターを対応する各地域に割り当てます。
+        // ゴミ処理センターを対応する各地域に割り当てます。
         for (var i in areaModels) {
           var area = areaModels[i];
           area.setCenter(center_data);
         };
-        //エリアとゴミ処理センターを対応後に、表示のリストを生成する。
-        //ListメニューのHTML作成
+        // エリアとゴミ処理センターを対応後に、表示のリストを生成する。
+        // ListメニューのHTML作成
         var selected_name = getSelectedAreaName();
         var area_select_form = $("#select_area");
         var select_html = "";
@@ -372,11 +381,11 @@ $(function() {
           select_html += '<option value="' + row_index + '" ' + selected + " >" + area_name + "</option>";
         }
 
-        //デバッグ用
+        // デバッグ用
         if (typeof dump == "function") {
           dump(areaModels);
         }
-        //HTMLへの適応
+        // HTMLへの適応
         area_select_form.html(select_html);
         area_select_form.change();
       });
@@ -404,7 +413,7 @@ $(function() {
         for (var i in data) {
           var row = new TargetRowModel(data[i]);
           for (var j = 0; j < descriptions.length; j++) {
-            //一致してるものに追加する。
+            // 一致してるものに追加する。
             if (descriptions[j].label == row.type) {
               descriptions[j].targets.push(row);
               break;
@@ -421,96 +430,96 @@ $(function() {
   }
 
   function updateData(row_index) {
-    //SVG が使えるかどうかの判定を行う。
-    //TODO Android 2.3以下では見れない（代替の表示も含め）不具合が改善されてない。。
-    //参考 http://satussy.blogspot.jp/2011/12/javascript-svg.html
+    // SVG が使えるかどうかの判定を行う。
+    // TODO Android 2.3以下では見れない（代替の表示も含め）不具合が改善されてない。。
+    // 参考 http:// satussy.blogspot.jp/2011/12/javascript-svg.html
     var ableSVG = (window.SVGAngle !== void 0);
-    //var ableSVG = false;  // SVG未使用の場合、descriptionの1項目目を使用
+    // var ableSVG = false;  // SVG未使用の場合、descriptionの1項目目を使用
     var areaModel = areaModels[row_index];
     var today = new Date();
-    //直近の一番近い日付を計算します。
+    // 直近の一番近い日付を計算します。
     areaModel.calcMostRect();
-    //トラッシュの近い順にソートします。
+    // トラッシュの近い順にソートします。
     areaModel.sortTrash();
     var accordion_height = $(window).height() / descriptions.length;
-    if(descriptions.length>4){
+    if (descriptions.length > 4) {
       accordion_height = accordion_height / 4.1;
-      if (accordion_height>140) {accordion_height = accordion_height / descriptions.length;};
-      if (accordion_height<130) {accordion_height=130;};
+      if (accordion_height > 140) { accordion_height = accordion_height / descriptions.length; };
+      if (accordion_height < 130) { accordion_height = 130; };
     }
     var styleHTML = "";
     var accordionHTML = "";
-    //アコーディオンの分類から対応の計算を行います。
+    // アコーディオンの分類から対応の計算を行います。
     for (var i in areaModel.trash) {
       var trash = areaModel.trash[i];
 
       for (var d_no in descriptions) {
         var description = descriptions[d_no];
-       if (description.label != trash.label) {
+        if (description.label != trash.label) {
           continue;
         }
 
-          var target_tag = "";
-          var furigana = "";
-          var target_tag = "";
-          var targets = description.targets;
-          for (var j in targets) {
-            var target = targets[j];
-            if (furigana != target.furigana) {
-              if (furigana != "") {
-                target_tag += "</ul>";
-              }
-
-              furigana = target.furigana;
-
-              target_tag += '<h4 class="initials">' + furigana + "</h4>";
-              target_tag += "<ul>";
+        var target_tag = "";
+        var furigana = "";
+        var target_tag = "";
+        var targets = description.targets;
+        for (var j in targets) {
+          var target = targets[j];
+          if (furigana != target.furigana) {
+            if (furigana != "") {
+              target_tag += "</ul>";
             }
 
-            target_tag += '<li style="list-style:none;">' + target.name + "</li>";
-            target_tag += '<p class="note">' + target.notice + "</p>";
+            furigana = target.furigana;
+
+            target_tag += '<h4 class="initials">' + furigana + "</h4>";
+            target_tag += "<ul>";
           }
 
-          target_tag += "</ul>";
+          target_tag += '<li style="list-style:none;">' + target.name + "</li>";
+          target_tag += '<p class="note">' + target.notice + "</p>";
+        }
 
-          var dateLabel = trash.getDateLabel();
-          //あと何日かを計算する処理です。
-          var leftDay = Math.ceil((trash.mostRecent.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        target_tag += "</ul>";
 
-          var leftDayText = "";
-          if (leftDay == 0) {
-            leftDayText = "今日";
-          } else if (leftDay == 1) {
-            leftDayText = "明日";
-          } else if (leftDay == 2) {
-            leftDayText = "明後日"
-          } else {
-            leftDayText = leftDay + "日後";
-          }
+        var dateLabel = trash.getDateLabel();
+        // あと何日かを計算する処理です。
+        var leftDay = Math.ceil((trash.mostRecent.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
-          styleHTML += '#accordion-group' + d_no + '{background-color:  ' + description.background + ';} ';
+        var leftDayText = "";
+        if (leftDay == 0) {
+          leftDayText = "今日";
+        } else if (leftDay == 1) {
+          leftDayText = "明日";
+        } else if (leftDay == 2) {
+          leftDayText = "明後日"
+        } else {
+          leftDayText = leftDay + "日後";
+        }
 
-          accordionHTML +=
-            '<div class="accordion-group" id="accordion-group' + d_no + '">' +
-            '<div class="accordion-heading">' +
-            '<a class="accordion-toggle" style="height:' + accordion_height + 'px" data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '">' +
-            '<div class="left-day">' + leftDayText + '</div>' +
-            '<div class="accordion-table" >';
-          if (ableSVG && SVGLabel) {
-            accordionHTML += '<img src="' + description.styles + '" alt="' + description.label + '"  />';
-          } else {
-            accordionHTML += '<p class="text-center">' + description.label + "</p>";
-          }
-          accordionHTML += "</div>" +
-            '<h6><p class="text-left date">' + dateLabel + "</p></h6>" +
-            "</a>" +
-            "</div>" +
-            '<div id="collapse' + i + '" class="accordion-body collapse">' +
-            '<div class="accordion-inner">' +
-            description.description + "<br />" + target_tag +
-            '<div class="targetDays"></div></div>' +
-            "</div>" +
-            "</div>";
+        styleHTML += '#accordion-group' + d_no + '{background-color:  ' + description.background + ';} ';
+
+        accordionHTML +=
+          '<div class="accordion-group" id="accordion-group' + d_no + '">' +
+          '<div class="accordion-heading">' +
+          '<a class="accordion-toggle" style="height:' + accordion_height + 'px" data-toggle="collapse" data-parent="#accordion" href="#collapse' + i + '">' +
+          '<div class="left-day">' + leftDayText + '</div>' +
+          '<div class="accordion-table" >';
+        if (ableSVG && SVGLabel) {
+          accordionHTML += '<img src="' + description.styles + '" alt="' + description.label + '"  />';
+        } else {
+          accordionHTML += '<p class="text-center">' + description.label + "</p>";
+        }
+        accordionHTML += "</div>" +
+          '<h6><p class="text-left date">' + dateLabel + "</p></h6>" +
+          "</a>" +
+          "</div>" +
+          '<div id="collapse' + i + '" class="accordion-body collapse">' +
+          '<div class="accordion-inner">' +
+          description.description + "<br />" + target_tag +
+          '<div class="targetDays"></div></div>' +
+          "</div>" +
+          "</div>";
       }
     }
 
@@ -519,22 +528,23 @@ $(function() {
     var accordion_elm = $("#accordion");
     accordion_elm.html(accordionHTML);
 
-    $('html,body').animate({scrollTop: 0}, 'fast');
+    $('html,body').animate({ scrollTop: 0 }, 'fast');
 
-    //アコーディオンのラベル部分をクリックしたら
-    $(".accordion-body").on("shown.bs.collapse", function() {
-      var body = $('body');
-      var accordion_offset = $($(this).parent().get(0)).offset().top;
-      body.animate({
-        scrollTop: accordion_offset
-      }, 50);
-    });
-    //アコーディオンの非表示部分をクリックしたら
-    $(".accordion-body").on("hidden.bs.collapse", function() {
-      if ($(".in").length == 0) {
-        $("html, body").scrollTop(0);
-      }
-    });
+    /* 検索時に不便なので無効化 */
+    // // アコーディオンのラベル部分をクリックしたら
+    // $(".accordion-body").on("shown.bs.collapse", function() {
+    //   var body = $('body');
+    //   var accordion_offset = $($(this).parent().get(0)).offset().top;
+    //   body.animate({
+    //     scrollTop: accordion_offset
+    //   }, 50);
+    // });
+    // // アコーディオンの非表示部分をクリックしたら
+    // $(".accordion-body").on("hidden.bs.collapse", function() {
+    //   if ($(".in").length == 0) {
+    //     $("html, body").scrollTop(0);
+    //   }
+    // });
   }
 
   function onChangeSelect(row_index) {　
@@ -565,16 +575,16 @@ $(function() {
     }
     return -1;
   }
-  //リストが選択されたら
+  // リストが選択されたら
   $("#select_area").change(function(data) {
     var row_index = $(data.target).val();
     onChangeSelect(row_index);
   });
 
-  //-----------------------------------
-  //位置情報をもとに地域を自動的に設定する処理です。
-  //これから下は現在、利用されておりません。
-  //将来的に使うかもしれないので残してあります。
+  // -----------------------------------
+  // 位置情報をもとに地域を自動的に設定する処理です。
+  // これから下は現在、利用されておりません。
+  // 将来的に使うかもしれないので残してあります。
   $("#gps_area").click(function() {
     navigator.geolocation.getCurrentPosition(function(position) {
       $.getJSON("area_candidate.php", {
@@ -618,4 +628,88 @@ $(function() {
     }
   }
   updateAreaList();
+
+  // ****************************** 文字列検索機能 -st
+
+  /** 検索用一時情報 オブジェクト */
+  var beforeSearchObjects = null;
+  /** 検索用一時情報 ハイライト前のsrc */
+  var beforeSearchSrcs = null;
+
+  /**
+   * 検索ボタンを押した時の挙動
+   */
+  $("#queryButton").click(function() {
+    var target = $("#queryInput").val();
+    search(target);
+  });
+
+  /**
+   * 文字列で検索し、背景色をオレンジにする
+   * @param {string} target 検索する文字列 
+   */
+  function search (target) {
+    // 検索状態を解除
+    clearSearch();
+
+    // 検索用一時情報初期化
+    beforeSearchObjects = [];
+    beforeSearchSrcs = [];
+
+    // 要素を取得
+    $('li:contains("' + target + '")').each(function() {
+      var self = this;
+      var src = $(self).html();
+
+      // 一時情報保存
+      beforeSearchObjects.push(self);
+      beforeSearchSrcs.push(src);
+
+      $(self).html(
+        // 該当情報ハイライト
+        src.replace(new RegExp(target, "g"),
+            '<span style="background:orange">' + target + '</span>')
+      );
+    });
+
+    // 一つでも見つかった場合は最初のヒット場所に移動
+    if (beforeSearchObjects.length != 0) {
+      // 該当要素があるaccordionを開く
+      for (var i = beforeSearchObjects.length - 1; i >= 0; i--) {
+        $(beforeSearchObjects[i]).parents('.accordion-body').collapse('show');
+      }
+      
+      // 開くアニメーションが終わるまで待つ
+      setTimeout(function() {
+        // 最初のヒット場所に移動
+        var position = $(beforeSearchObjects[0]).offset().top - $(window).height()/2;
+        $("html, body").animate({
+          scrollTop : position
+        }, {
+          queue : true
+        });
+      }, 500);
+    }
+  }
+
+  /**
+   * 検索で変わった背景を元に戻す
+   */
+  function clearSearch() {
+    // 履歴が無い場合は無視
+    if (beforeSearchObjects == null || beforeSearchSrcs == null) {
+      return;
+    }
+
+    for (var i = 0; i < beforeSearchObjects.length; i++) {
+      // 要素を元に戻す
+      $(beforeSearchObjects[i]).html(beforeSearchSrcs[i]);
+    }
+
+    // 一時情報を削除
+    beforeSearchObjects = null;
+    beforeSearchSrcs = null;
+  }
+
+  // ****************************** 文字列検索機能 -ed
 });

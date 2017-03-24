@@ -1,0 +1,22 @@
+{
+  "name": "5374",
+  "version": "1.0.0",
+  "description": "##「いつ、どのゴミが収集されているのか？」",
+  "main": "testsv.js",
+  "scripts": {
+    "test": "node testsv.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TomiGie/5374.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TomiGie/5374/issues"
+  },
+  "homepage": "https://github.com/TomiGie/5374#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
